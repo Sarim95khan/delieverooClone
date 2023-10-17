@@ -20,3 +20,17 @@ Configuration:
    Custom Header Design:
 
 3. Make a component of Custom Header
+
+4. Bottom Sheet Modal
+   react-native-bottom-sheet by gorhom built with react-native-reanimated
+
+   yarn add @gorhom/bottom-sheet@^4
+
+   yarn add react-native-reanimated react-native-gesture-handler
+
+   update plugin in babel.config.js:
+   plugins: [
+   // Required for expo-router
+   'expo-router/babel',
+   'react-native-reanimated/plugin',
+   ],

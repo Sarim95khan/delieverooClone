@@ -6,12 +6,14 @@ import {
   Image,
   TextInput,
 } from 'react-native';
-import React from 'react';
+import React, { useRef } from 'react';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { Link } from 'expo-router';
+import BottomSheet from './BottomSheet';
 // import { Image } from 'expo-image';
 // import { TouchableOpacity } from 'react-native-gesture-handler';
 
@@ -44,17 +46,23 @@ const SearchBar = () => (
   </View>
 );
 const CustomHeader = () => {
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const openModal = () => {
+    bottomSheetRef.current?.present();
+  };
   return (
     <SafeAreaView style={styles.safeArea}>
+      <BottomSheet ref={bottomSheetRef} />
+
       <View style={styles.container}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={openModal}>
           <Image
             style={styles.bike}
             source={require('@/assets/images/bike.png')}
           />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.titleContainer}>
+        <TouchableOpacity onPress={openModal} style={styles.titleContainer}>
           <Text style={styles.title}>Delivery · Now</Text>
           <View style={styles.locationTab}>
             <Text style={styles.subTitle}>Karachi-Pakistan</Text>
