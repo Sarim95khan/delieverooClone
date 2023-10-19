@@ -34,3 +34,7 @@ Configuration:
    'expo-router/babel',
    'react-native-reanimated/plugin',
    ],
+
+5. Adding Filter Modal
+   add react-native-bouncy-checkbox :
+   npm i react-native-bouncy-checkbox

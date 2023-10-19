@@ -32,7 +32,7 @@ const SearchBar = () => (
           placeholder="Restaurant, Clubs, Hookers"
         />
       </View>
-      <Link href={'/'} asChild>
+      <Link href={'/filter'} asChild>
         <TouchableOpacity>
           <Ionicons
             name="options-outline"
