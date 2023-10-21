@@ -7,12 +7,18 @@ import {
   ListRenderItem,
   Button,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Colors from '@/constants/Colors';
 import categories from '@/assets/data/filter.json';
 import { FC } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
+import { useNavigation } from 'expo-router';
 
 interface Categories {
   name: string;
@@ -52,7 +58,22 @@ const ListHeader = () => (
 );
 
 const Filter = () => {
+  const nav = useNavigation();
   const [items, setItems] = useState<Categories[]>(categories);
+  const [selected, setSelected] = useState<Categories[]>([]);
+  const flexWidth = useSharedValue(0);
+  const scaleVal = useSharedValue(0);
+
+  useEffect(() => {
+    const hasSelected = selected.length > 0;
+    const selectedItems = items.filter((item) => item.checked);
+    const newSelected = selectedItems.length > 0;
+    if (hasSelected !== newSelected) {
+      flexWidth.value = withTiming(newSelected ? 150 : 0);
+      scaleVal.value = withTiming(newSelected ? 1 : 0);
+    }
+    setSelected(selectedItems);
+  }, [items]);
 
   const resetAll = () => {
     const updatedItem = items.map((item) => {
@@ -62,6 +83,18 @@ const Filter = () => {
     });
     setItems(updatedItem);
   };
+  const animatedStyles = useAnimatedStyle(() => {
+    return {
+      width: flexWidth.value,
+      opacity: flexWidth.value > 0 ? 1 : 0,
+    };
+  });
+
+  const animatedText = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: scaleVal.value }],
+    };
+  });
 
   const renderItem: ListRenderItem<Categories> = ({ item, index }) => (
     <View style={styles.row}>
@@ -90,7 +123,6 @@ const Filter = () => {
   );
   return (
     <View style={styles.container}>
-      <Button title="Reset All" onPress={() => resetAll()} />
       <FlatList
         data={items}
         renderItem={renderItem}
@@ -98,9 +130,22 @@ const Filter = () => {
       />
       <View style={{ height: 68 }} />
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.footerButton}>
-          <Text style={styles.footerText}>Done</Text>
-        </TouchableOpacity>
+        <View style={styles.btnContainer}>
+          <Animated.View style={[animatedStyles, styles.outlineBtn]}>
+            <TouchableOpacity onPress={resetAll}>
+              <Animated.Text style={[animatedText, styles.outlineBtnText]}>
+                Clear All
+              </Animated.Text>
+            </TouchableOpacity>
+          </Animated.View>
+
+          <TouchableOpacity
+            style={styles.footerButton}
+            onPress={() => nav.goBack()}
+          >
+            <Text style={styles.footerText}>Done</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -129,9 +174,13 @@ const styles = StyleSheet.create({
   },
   footerButton: {
     backgroundColor: Colors.primary,
-    padding: 16,
+    padding: 8,
     alignItems: 'center',
+    alignContent: 'center',
+    justifyContent: 'center',
     borderRadius: 8,
+    flex: 1,
+    height: 56,
   },
   footerText: {
     color: '#fff',
@@ -167,5 +216,24 @@ const styles = StyleSheet.create({
     padding: 8,
     backgroundColor: '#fff',
     alignItems: 'center',
+  },
+  btnContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+  },
+  outlineBtn: {
+    borderColor: Colors.primary,
+    borderWidth: 1,
+    borderRadius: 8,
+    alignItems: 'center',
+    height: 56,
+    justifyContent: 'center',
+  },
+  outlineBtnText: {
+    color: Colors.primary,
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
