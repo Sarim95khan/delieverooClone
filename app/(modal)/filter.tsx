@@ -4,23 +4,21 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
+  ListRenderItem,
+  Button,
 } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import Colors from '@/constants/Colors';
 import categories from '@/assets/data/filter.json';
 import { FC } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import BouncyCheckbox from 'react-native-bouncy-checkbox';
 
 interface Categories {
   name: string;
   count: number;
   checked?: boolean;
 }
-const renderItem = ({ item }: { item: any }) => (
-  <View style={styles.row}>
-    <Text>{item.name}</Text>
-  </View>
-);
 
 const ListHeader = () => (
   <>
@@ -54,14 +52,51 @@ const ListHeader = () => (
 );
 
 const Filter = () => {
+  const [items, setItems] = useState<Categories[]>(categories);
+
+  const resetAll = () => {
+    const updatedItem = items.map((item) => {
+      item.checked = false;
+
+      return item;
+    });
+    setItems(updatedItem);
+  };
+
+  const renderItem: ListRenderItem<Categories> = ({ item, index }) => (
+    <View style={styles.row}>
+      <Text style={{ flex: 1 }}>
+        {item.name} ({item.count})
+      </Text>
+      <BouncyCheckbox
+        fillColor={Colors.primary}
+        iconStyle={{ borderColor: Colors.primary, borderRadius: 4 }}
+        innerIconStyle={{ borderRadius: 4, borderWidth: 2 }}
+        disableBuiltInState
+        onPress={() => {
+          const isChecked = items[index].checked;
+
+          const updateItems = items.map((item) => {
+            if (item.name === items[index].name) {
+              item.checked = !isChecked;
+            }
+            return item;
+          });
+          setItems(updateItems);
+        }}
+        isChecked={items[index].checked}
+      />
+    </View>
+  );
   return (
     <View style={styles.container}>
+      <Button title="Reset All" onPress={() => resetAll()} />
       <FlatList
-        data={categories}
+        data={items}
         renderItem={renderItem}
         ListHeaderComponent={() => <ListHeader />}
       />
-      <View style={{ height: 80 }} />
+      <View style={{ height: 68 }} />
       <View style={styles.footer}>
         <TouchableOpacity style={styles.footerButton}>
           <Text style={styles.footerText}>Done</Text>
